@@ -78,6 +78,18 @@ function clickTile() {
 
 }
 
+function revealMines() {
+  for (let col = 0; col < columns; col++) {
+    for (let row = 0; row < rows; row++) {
+      const tile = board[col][row];
+      if (minesLocation.includes(tile.id)) {
+        tile.innerText = '💣';
+        tile.style.backgroundColor = 'red';
+      }
+    }
+  }
+}
+
 const upper = 1;
 const lower = -1;
 
