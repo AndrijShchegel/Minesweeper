@@ -5,6 +5,9 @@ const rows = 8;
 const columns = 8;
 const minesCount = 10;
 const minesLocation = [];
+let tilesClicked = 0;
+let flagEnabled = false;
+let gameOver = false;
 
 document.getElementById('flag-button').addEventListener('click', setFlag);
 document.getElementById('flag-button').addEventListener('click', setFlag);
