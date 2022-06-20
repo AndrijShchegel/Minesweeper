@@ -6,6 +6,8 @@ const columns = 8;
 const minesCount = 10;
 const minesLocation = [];
 
+document.getElementById('flag-button').addEventListener('click', setFlag);
+
 const random = size => (Math.floor(Math.random() * size));
 
 const setMines = () => {
@@ -36,3 +38,42 @@ const startGame = () => {
 };
 
 startGame();
+
+function setFlag() {
+  if (flagEnabled) {
+    flagEnabled = false;
+    document.getElementById('flag-button').style.backgroundColor = 'lightgray';
+  } else {
+    flagEnabled = true;
+    document.getElementById('flag-button').style.backgroundColor = 'darkgray';
+  }
+}
+
+function clickTile() {
+  if (gameOver || this.classList.contains('tile-clicked')) {
+    return;
+  }
+
+  const tile = this;
+  if (flagEnabled) {
+    if (tile.innerText === '') {
+      tile.innerText = '🚩';
+    } else if (tile.innerText === '🚩') {
+      tile.innerText = '';
+    }
+    return;
+  }
+
+  if (minesLocation.includes(tile.id)) {
+    gameOver = true;
+    revealMines();
+    return;
+  }
+
+
+  const coords = tile.id.split('-');
+  const col = parseInt(coords[0]);
+  const row = parseInt(coords[1]);
+  checkMine(col, row);
+
+}
