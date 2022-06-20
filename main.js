@@ -7,6 +7,7 @@ const minesCount = 10;
 const minesLocation = [];
 
 document.getElementById('flag-button').addEventListener('click', setFlag);
+document.getElementById('flag-button').addEventListener('click', setFlag);
 
 const random = size => (Math.floor(Math.random() * size));
 
@@ -70,12 +71,10 @@ function clickTile() {
     return;
   }
 
-
   const coords = tile.id.split('-');
   const col = parseInt(coords[0]);
   const row = parseInt(coords[1]);
   checkMine(col, row);
-
 }
 
 function revealMines() {
