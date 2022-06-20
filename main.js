@@ -77,3 +77,46 @@ function clickTile() {
   checkMine(col, row);
 
 }
+
+const upper = 1;
+const lower = -1;
+
+function checkMine(col, row) {
+  if (col < 0 || col >= columns || row < 0 || row >= rows) {
+    return;
+  }
+  if (board[col][row].classList.contains('tile-clicked')) {
+    return;
+  }
+
+  board[col][row].classList.add('tile-clicked');
+  tilesClicked += 1;
+
+  let minesFound = 0;
+  for (let i = lower; i <= upper; i++) {
+    for (let j = lower; j <= upper; j++) {
+      if (i !== 0 || j !== 0) {
+        minesFound += checkTile(col + i, row + j);
+      }
+    }
+  }
+
+  if (minesFound > 0) {
+    board[col][row].innerText = minesFound;
+    board[col][row].classList.add('text' + minesFound);
+  } else {
+    for (let i = lower; i <= upper; i++) {
+      for (let j = lower; j <= upper; j++) {
+        if (i !== 0 || j !== 0) {
+          minesFound += checkMine(col + i, row + j);
+        }
+      }
+    }
+  }
+
+  if (tilesClicked === rows * columns - minesCount) {
+    document.getElementById('Win').innerText = 'You are the winner!';
+    gameOver = true;
+  }
+
+}
