@@ -120,3 +120,13 @@ function checkMine(col, row) {
   }
 
 }
+
+function checkTile(col, row) {
+  if (row < 0 || row >= rows || col < 0 || col >= columns) {
+    return 0;
+  }
+  if (minesLocation.includes(col + '-' + row)) {
+    return 1;
+  }
+  return 0;
+}
