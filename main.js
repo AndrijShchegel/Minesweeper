@@ -33,7 +33,7 @@ const startGame = () => {
       const tile = document.createElement('div');
       tile.id = col + '-' + row;
       tile.addEventListener('click', clickTile);
-      tile.addEventListener('contextmenu', (e) => {
+      tile.addEventListener('contextmenu', e => {
         e.preventDefault();
         if (tile.innerText === '') {
           tile.innerText = '🚩';
@@ -49,24 +49,7 @@ const startGame = () => {
 
 startGame();
 
-function clickTile() {
-  if (gameOver || this.classList.contains('tile-clicked')) {
-    return;
-  }
-
-  if (minesLocation.includes(tile.id)) {
-    gameOver = true;
-    revealMines();
-    return;
-  }
-
-  const coords = tile.id.split('-');
-  const col = parseInt(coords[0]);
-  const row = parseInt(coords[1]);
-  checkMine(col, row);
-}
-
-function revealMines() {
+const revealMines = () => {
   for (let col = 0; col < columns; col++) {
     for (let row = 0; row < rows; row++) {
       const tile = board[col][row];
@@ -76,7 +59,7 @@ function revealMines() {
       }
     }
   }
-}
+};
 
 const upper = 1;
 const lower = -1;
@@ -89,9 +72,19 @@ const check = (col, row, checkWhat) => {
       }
     }
   }
-}
+};
 
-function checkMine(col, row) {
+const checkTile = (col, row) => {
+  if (row < 0 || row >= rows || col < 0 || col >= columns) {
+    return 0;
+  }
+  if (minesLocation.includes(col + '-' + row)) {
+    return 1;
+  }
+  return 0;
+};
+
+const checkMine = (col, row) => {
   if (col < 0 || col >= columns || row < 0 || row >= rows) {
     return;
   }
@@ -116,15 +109,21 @@ function checkMine(col, row) {
     document.getElementById('Win').innerText = 'You are the winner!';
     gameOver = true;
   }
+};
 
-}
+function clickTile() {
+  if (gameOver || this.classList.contains('tile-clicked')) {
+    return;
+  }
 
-function checkTile(col, row) {
-  if (row < 0 || row >= rows || col < 0 || col >= columns) {
-    return 0;
+  if (minesLocation.includes(this.id)) {
+    gameOver = true;
+    revealMines();
+    return;
   }
-  if (minesLocation.includes(col + '-' + row)) {
-    return 1;
-  }
-  return 0;
+
+  const coords = this.id.split('-');
+  const col = parseInt(coords[0]);
+  const row = parseInt(coords[1]);
+  checkMine(col, row);
 }
