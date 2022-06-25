@@ -80,6 +80,16 @@ function revealMines() {
 
 const upper = 1;
 const lower = -1;
+let minesFound = 0;
+const check = (col, row, checkWhat) => {
+  for (let i = lower; i <= upper; i++) {
+    for (let j = lower; j <= upper; j++) {
+      if (i !== 0 || j !== 0) {
+        minesFound += checkWhat(col + i, row + j);
+      }
+    }
+  }
+}
 
 function checkMine(col, row) {
   if (col < 0 || col >= columns || row < 0 || row >= rows) {
@@ -92,26 +102,14 @@ function checkMine(col, row) {
   board[col][row].classList.add('tile-clicked');
   tilesClicked += 1;
 
-  let minesFound = 0;
-  for (let i = lower; i <= upper; i++) {
-    for (let j = lower; j <= upper; j++) {
-      if (i !== 0 || j !== 0) {
-        minesFound += checkTile(col + i, row + j);
-      }
-    }
-  }
+  minesFound = 0;
+  check(col, row, checkTile);
 
   if (minesFound > 0) {
     board[col][row].innerText = minesFound;
     board[col][row].classList.add('text' + minesFound);
   } else {
-    for (let i = lower; i <= upper; i++) {
-      for (let j = lower; j <= upper; j++) {
-        if (i !== 0 || j !== 0) {
-          minesFound += checkMine(col + i, row + j);
-        }
-      }
-    }
+    check(col, row, checkMine);
   }
 
   if (tilesClicked === rows * columns - minesCount) {
