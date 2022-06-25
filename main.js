@@ -6,11 +6,9 @@ const columns = 8;
 const minesCount = 10;
 const minesLocation = [];
 let tilesClicked = 0;
-let flagEnabled = false;
 let gameOver = false;
 
-document.getElementById('flag-button').addEventListener('click', setFlag);
-document.getElementById('flag-button').addEventListener('click', setFlag);
+document.getElementById('mines-count').innerText = minesCount;
 
 const random = size => (Math.floor(Math.random() * size));
 
@@ -35,6 +33,14 @@ const startGame = () => {
       const tile = document.createElement('div');
       tile.id = col + '-' + row;
       tile.addEventListener('click', clickTile);
+      tile.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        if (tile.innerText === '') {
+          tile.innerText = '🚩';
+        } else if (tile.innerText === '🚩') {
+          tile.innerText = '';
+        }
+      });
       document.getElementById('board').append(tile);
       board[col][row] = tile;
     }
@@ -43,28 +49,8 @@ const startGame = () => {
 
 startGame();
 
-function setFlag() {
-  if (flagEnabled) {
-    flagEnabled = false;
-    document.getElementById('flag-button').style.backgroundColor = 'lightgray';
-  } else {
-    flagEnabled = true;
-    document.getElementById('flag-button').style.backgroundColor = 'darkgray';
-  }
-}
-
 function clickTile() {
   if (gameOver || this.classList.contains('tile-clicked')) {
-    return;
-  }
-
-  const tile = this;
-  if (flagEnabled) {
-    if (tile.innerText === '') {
-      tile.innerText = '🚩';
-    } else if (tile.innerText === '🚩') {
-      tile.innerText = '';
-    }
     return;
   }
 
