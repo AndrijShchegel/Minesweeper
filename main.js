@@ -123,7 +123,7 @@ function clickTile() {
   }
 
   const coords = this.id.split('-');
-  const col = parseInt(coords[0]);
-  const row = parseInt(coords[1]);
+  const col = +coords[0];
+  const row = +coords[1];
   checkMine(col, row);
 }
