@@ -17,6 +17,15 @@ document.getElementById('mines-count').innerText = gameState.minesCount;
 
 const random = (size) => (Math.floor(Math.random() * size));
 
+const rightClick = (event, tile) => {
+  event.preventDefault();
+  if (tile.innerText === '') {
+    tile.innerText = '🚩';
+  } else if (tile.innerText === '🚩') {
+    tile.innerText = '';
+  }
+};
+
 const setMines = () => {
   let minesLeft = gameState.minesCount;
   while (minesLeft > 0) {
@@ -38,14 +47,7 @@ const startGame = () => {
       const tile = document.createElement('div');
       tile.id = col + '-' + row;
       tile.addEventListener('click', clickTile);
-      tile.addEventListener('contextmenu', (event) => {
-        event.preventDefault();
-        if (tile.innerText === '') {
-          tile.innerText = '🚩';
-        } else if (tile.innerText === '🚩') {
-          tile.innerText = '';
-        }
-      });
+      tile.addEventListener('contextmenu', (event) => rightClick(event, tile));
       document.getElementById('board').append(tile);
       gameState.board[col][row] = tile;
     }
