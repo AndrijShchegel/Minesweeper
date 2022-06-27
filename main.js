@@ -1,25 +1,30 @@
 'use strict';
 
-const board = [];
-const rows = 8;
-const columns = 8;
-const minesCount = 10;
-const minesLocation = [];
-let tilesClicked = 0;
-let gameOver = false;
+const gameState = {
+  board: [],
+  rows: 8,
+  columns: 8,
+  minesCount: 10,
+  minesLocation: [],
+  tilesClicked: 0,
+  gameOver: false,
+  upper: 1,
+  lower: -1,
+  minesFound: 0
+};
 
-document.getElementById('mines-count').innerText = minesCount;
+document.getElementById('mines-count').innerText = gameState.minesCount;
 
 const random = size => (Math.floor(Math.random() * size));
 
 const setMines = () => {
-  let minesLeft = minesCount;
+  let minesLeft = gameState.minesCount;
   while (minesLeft > 0) {
-    const row = random(rows);
-    const col = random(columns);
+    const row = random(gameState.rows);
+    const col = random(gameState.columns);
     const id = col + '-' + row;
-    if (!minesLocation.includes(id)) {
-      minesLocation.push(id);
+    if (!gameState.minesLocation.includes(id)) {
+      gameState.minesLocation.push(id);
       minesLeft -= 1;
     }
   }
@@ -27,9 +32,9 @@ const setMines = () => {
 
 const startGame = () => {
   setMines();
-  for (let col = 0; col < columns; col++) {
-    board[col] = [];
-    for (let row = 0; row < rows; row++) {
+  for (let col = 0; col < gameState.columns; col++) {
+    gameState.board[col] = [];
+    for (let row = 0; row < gameState.rows; row++) {
       const tile = document.createElement('div');
       tile.id = col + '-' + row;
       tile.addEventListener('click', clickTile);
@@ -42,7 +47,7 @@ const startGame = () => {
         }
       });
       document.getElementById('board').append(tile);
-      board[col][row] = tile;
+      gameState.board[col][row] = tile;
     }
   }
 };
@@ -50,10 +55,10 @@ const startGame = () => {
 startGame();
 
 const revealMines = () => {
-  for (let col = 0; col < columns; col++) {
-    for (let row = 0; row < rows; row++) {
-      const tile = board[col][row];
-      if (minesLocation.includes(tile.id)) {
+  for (let col = 0; col < gameState.columns; col++) {
+    for (let row = 0; row < gameState.rows; row++) {
+      const tile = gameState.board[col][row];
+      if (gameState.minesLocation.includes(tile.id)) {
         tile.innerText = '💣';
         tile.style.backgroundColor = 'red';
       }
@@ -61,63 +66,60 @@ const revealMines = () => {
   }
 };
 
-const upper = 1;
-const lower = -1;
-let minesFound = 0;
 const check = (col, row, checkWhat) => {
-  for (let i = lower; i <= upper; i++) {
-    for (let j = lower; j <= upper; j++) {
+  for (let i = gameState.lower; i <= gameState.upper; i++) {
+    for (let j = gameState.lower; j <= gameState.upper; j++) {
       if (i !== 0 || j !== 0) {
-        minesFound += checkWhat(col + i, row + j);
+        gameState.minesFound += checkWhat(col + i, row + j);
       }
     }
   }
 };
 
 const checkTile = (col, row) => {
-  if (row < 0 || row >= rows || col < 0 || col >= columns) {
+  if (row < 0 || row >= gameState.rows || col < 0 || col >= gameState.columns) {
     return 0;
   }
-  if (minesLocation.includes(col + '-' + row)) {
+  if (gameState.minesLocation.includes(col + '-' + row)) {
     return 1;
   }
   return 0;
 };
 
 const checkMine = (col, row) => {
-  if (col < 0 || col >= columns || row < 0 || row >= rows) {
+  if (col < 0 || col >= gameState.columns || row < 0 || row >= gameState.rows) {
     return;
   }
-  if (board[col][row].classList.contains('tile-clicked')) {
+  if (gameState.board[col][row].classList.contains('tile-clicked')) {
     return;
   }
 
-  board[col][row].classList.add('tile-clicked');
-  tilesClicked += 1;
+  gameState.board[col][row].classList.add('tile-clicked');
+  gameState.tilesClicked += 1;
 
-  minesFound = 0;
+  gameState.minesFound = 0;
   check(col, row, checkTile);
 
-  if (minesFound > 0) {
-    board[col][row].innerText = minesFound;
-    board[col][row].classList.add('text' + minesFound);
+  if (gameState.minesFound > 0) {
+    gameState.board[col][row].innerText = gameState.minesFound;
+    gameState.board[col][row].classList.add('text' + gameState.minesFound);
   } else {
     check(col, row, checkMine);
   }
 
-  if (tilesClicked === rows * columns - minesCount) {
+  if (gameState.tilesClicked === gameState.rows * gameState.columns - gameState.minesCount) {
     document.getElementById('Win').innerText = 'You are the winner!';
-    gameOver = true;
+    gameState.gameOver = true;
   }
 };
 
 function clickTile() {
-  if (gameOver || this.classList.contains('tile-clicked')) {
+  if (gameState.gameOver || this.classList.contains('tile-clicked') || this.innerText === '🚩') {
     return;
   }
 
-  if (minesLocation.includes(this.id)) {
-    gameOver = true;
+  if (gameState.minesLocation.includes(this.id)) {
+    gameState.gameOver = true;
     revealMines();
     return;
   }
