@@ -86,10 +86,18 @@ const checkTile = (col, row) => {
   return 0;
 };
 
+const checkWin = () => {
+  if (gameState.tilesClicked === gameState.rows * gameState.columns - gameState.minesCount) {
+    document.getElementById('Win').innerText = 'You are the winner!';
+    gameState.gameOver = true;
+  }
+};
+
 const checkMine = (col, row) => {
   if (col < 0 || col >= gameState.columns || row < 0 || row >= gameState.rows) {
     return;
   }
+  
   if (gameState.board[col][row].classList.contains('tile-clicked')) {
     return;
   }
@@ -107,10 +115,7 @@ const checkMine = (col, row) => {
     check(col, row, checkMine);
   }
 
-  if (gameState.tilesClicked === gameState.rows * gameState.columns - gameState.minesCount) {
-    document.getElementById('Win').innerText = 'You are the winner!';
-    gameState.gameOver = true;
-  }
+  checkWin();
 };
 
 function clickTile() {
