@@ -15,7 +15,7 @@ const gameState = {
 
 document.getElementById('mines-count').innerText = gameState.minesCount;
 
-const random = size => (Math.floor(Math.random() * size));
+const random = (size) => (Math.floor(Math.random() * size));
 
 const setMines = () => {
   let minesLeft = gameState.minesCount;
@@ -38,8 +38,8 @@ const startGame = () => {
       const tile = document.createElement('div');
       tile.id = col + '-' + row;
       tile.addEventListener('click', clickTile);
-      tile.addEventListener('contextmenu', e => {
-        e.preventDefault();
+      tile.addEventListener('contextmenu', (event) => {
+        event.preventDefault();
         if (tile.innerText === '') {
           tile.innerText = '🚩';
         } else if (tile.innerText === '🚩') {
