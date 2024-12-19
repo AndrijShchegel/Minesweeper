@@ -1,53 +1,91 @@
 'use strict';
 
-const gameState = {
-  board: [],
-  rows: 8,
-  columns: 8,
-  minesCount: 10,
-  minesLocation: [],
-  tilesClicked: 0,
-  gameOver: false,
-  minesFound: 0,
-  flagsLocation: [],
-  firstClick: true,
+let gameBoard = [];
+let rows = 8;
+let columns = 8;
+let minesCount = 10;
+let minesLocation = [];
+let tilesClicked = 0;
+let gameOver = false;
+let minesFound = 0;
+let flagsLocation = [];
+let firstClick = true;
+let timeElapsed = 0;
+let isPaused = true;
+let timerInterval;
+
+const timerElement = document.getElementById("timer");
+const minesLeft = document.getElementById('mines-count');
+
+const formatTime = (timeInSeconds) => {
+  const minutes = Math.floor(timeInSeconds / 60).toString().padStart(2, "0");
+  const seconds = (timeInSeconds % 60).toString().padStart(2, "0");
+  return `${minutes}:${seconds}`;
 };
 
 const random = (size) => (Math.floor(Math.random() * size));
 
+const updateTimerDisplay = () => {
+  timerElement.textContent = formatTime(timeElapsed);
+};
+
+const toggleTimer = () => {
+  if (isPaused) {
+    isPaused = false;
+    timerInterval = setInterval(() => {
+      timeElapsed++;
+      updateTimerDisplay();
+    }, 1000);
+  } else {
+    isPaused = true;
+    clearInterval(timerInterval);
+  }
+};
+
+const resetTimer = () => {
+  clearInterval(timerInterval);
+  timeElapsed = 0;
+  isPaused = true;
+  updateTimerDisplay();
+};
+
 const rightClick = (event, tile) => {
   event.preventDefault();
-  if (gameState.gameOver) {
+  if (gameOver) {
     return
-  } else if (tile.innerText === '' && gameState.flagsLocation.length < gameState.minesCount) {
+  } 
+  if (tile.classList.contains('tile-clicked')) {
+    return;
+  }
+  if (tile.innerText === '' && flagsLocation.length < minesCount) {
     tile.innerText = '🚩';
-    gameState.flagsLocation.push(tile.id);
+    flagsLocation.push(tile.id);
   } else if (tile.innerText === '🚩') {
     tile.innerText = '';
-    gameState.flagsLocation = gameState.flagsLocation.filter(id => id !== tile.id);
+    flagsLocation = flagsLocation.filter(id => id !== tile.id);
   }
-  document.getElementById('mines-count').innerText = gameState.minesCount - gameState.flagsLocation.length;
+  minesLeft.innerText = minesCount - flagsLocation.length;
 };
 
 const setMines = (tileId) => {
-  let minesLeft = gameState.minesCount;
+  let minesLeft = minesCount;
   while (minesLeft > 0) {
-    const row = random(gameState.rows);
-    const col = random(gameState.columns);
+    const row = random(rows);
+    const col = random(columns);
     const id = col + '-' + row;
-    if (!gameState.minesLocation.includes(id) && id !== tileId) {
-      gameState.minesLocation.push(id);
+    if (!minesLocation.includes(id) && id !== tileId) {
+      minesLocation.push(id);
       minesLeft -= 1;
     }
   }
 };
 const resetBoard = () => {
-  gameState.board = [];
-  gameState.minesLocation = [];
-  gameState.flagsLocation = [];
-  gameState.tilesClicked = 0;
-  gameState.gameOver = false;
-  gameState.firstClick = true; 
+  gameBoard = [];
+  minesLocation = [];
+  flagsLocation = [];
+  tilesClicked = 0;
+  gameOver = false;
+  firstClick = true; 
 }
 const startGame = () => {
   const board = document.getElementById('board');
@@ -56,17 +94,17 @@ const startGame = () => {
 
   resetBoard();
   
-  document.getElementById('mines-count').innerText = gameState.minesCount;
-  for (let col = 0; col < gameState.columns; col++) {
-    gameState.board[col] = [];
-    for (let row = 0; row < gameState.rows; row++) {
+  minesLeft.innerText = minesCount;
+  for (let col = 0; col < columns; col++) {
+    gameBoard[col] = [];
+    for (let row = 0; row < rows; row++) {
       const tile = document.createElement('div');
       tile.id = col + '-' + row;
       tile.addEventListener('click', () => clickTile(tile));
       tile.addEventListener('contextmenu', (event) => rightClick(event, tile));
       tile.addEventListener("dblclick", () => dblclickTile(tile));
       board.append(tile);
-      gameState.board[col][row] = tile;
+      gameBoard[col][row] = tile;
     }
   }
 };
@@ -89,10 +127,10 @@ setupDifficultyButtons();
 document.addEventListener('DOMContentLoaded', startGame);
 
 const revealMines = () => {
-  for (let col = 0; col < gameState.columns; col++) {
-    for (let row = 0; row < gameState.rows; row++) {
-      const tile = gameState.board[col][row];
-      if (gameState.minesLocation.includes(tile.id)) {
+  for (let col = 0; col < columns; col++) {
+    for (let row = 0; row < rows; row++) {
+      const tile = gameBoard[col][row];
+      if (minesLocation.includes(tile.id)) {
         tile.innerText = '💣';
         tile.style.backgroundColor = 'red';
       }
@@ -103,58 +141,59 @@ const revealMines = () => {
 const check = (col, row, checkWhat) => {
   for (let i = -1; i <= 1; i++) {
     for (let j = -1; j <= 1; j++) {
-      gameState.minesFound += checkWhat(col + i, row + j);
+      minesFound += checkWhat(col + i, row + j);
     }
   }
 };
 
 const checkTile = (col, row) => {
-  if (row < 0 || row >= gameState.rows || col < 0 || col >= gameState.columns) {
+  if (row < 0 || row >= rows || col < 0 || col >= columns) {
     return 0;
   }
-  if (gameState.minesLocation.includes(col + '-' + row)) {
+  if (minesLocation.includes(col + '-' + row)) {
     return 1;
   }
   return 0;
 };
 
 const checkFlag = (col, row) => {
-  if (row < 0 || row >= gameState.rows || col < 0 || col >= gameState.columns) {
+  if (row < 0 || row >= rows || col < 0 || col >= columns) {
     return 0;
   }
-  if (gameState.flagsLocation.includes(col + '-' + row)) {
+  if (flagsLocation.includes(col + '-' + row)) {
     return 1;
   }
   return 0;
 };
 
 const checkWin = () => {
-  if (gameState.tilesClicked === gameState.rows * gameState.columns - gameState.minesCount) {
+  if (tilesClicked === rows * columns - minesCount) {
     document.getElementById('Win').innerText = 'You are the winner!';
-    gameState.gameOver = true;
+    gameOver = true;
+    toggleTimer();
   }
 };
 
 const checkMine = (col, row) => {
-  if (col < 0 || col >= gameState.columns || row < 0 || row >= gameState.rows) {
+  if (col < 0 || col >= columns || row < 0 || row >= rows) {
     return;
   }
 
-  const tile = gameState.board[col][row];
+  const tile = gameBoard[col][row];
 
   if (tile.classList.contains('tile-clicked') || tile.innerText === '🚩') {
     return;
   }
 
   tile.classList.add('tile-clicked');
-  gameState.tilesClicked += 1;
+  tilesClicked += 1;
 
-  gameState.minesFound = 0;
+  minesFound = 0;
   check(col, row, checkTile);
 
-  if (gameState.minesFound > 0) {
-    tile.innerText = gameState.minesFound;
-    tile.classList.add('text' + gameState.minesFound);
+  if (minesFound > 0) {
+    tile.innerText = minesFound;
+    tile.classList.add('text' + minesFound);
   } else {
     check(col, row, checkMine);
   }
@@ -163,17 +202,19 @@ const checkMine = (col, row) => {
 };
 
 const clickTile = (tile) => {
-  if (gameState.firstClick) {
+  if (firstClick) {
   setMines(tile.id);
-  gameState.firstClick = false;
+  firstClick = false;
+  toggleTimer();
   }
-  if (gameState.gameOver || tile.classList.contains('tile-clicked') || tile.innerText === '🚩') {
+  if (gameOver || tile.classList.contains('tile-clicked') || tile.innerText === '🚩') {
     return;
   }
 
-  if (gameState.minesLocation.includes(tile.id)) {
-    gameState.gameOver = true;
+  if (minesLocation.includes(tile.id)) {
+    gameOver = true;
     revealMines();
+    toggleTimer();
     return;
   }
   const coords = tile.id.split('-');
@@ -204,12 +245,12 @@ const revealKnown = (col, row) => {
 }
 
 const dblclickTile = (tile) => {
-  if (gameState.gameOver || tile.innerText === '🚩') {
+  if (gameOver || tile.innerText === '🚩') {
     return;
   }
 
-  if (gameState.minesLocation.includes(tile.id)) {
-    gameState.gameOver = true;
+  if (minesLocation.includes(tile.id)) {
+    gameOver = true;
     revealMines();
     return;
   }
@@ -226,8 +267,8 @@ const updateBoardSize = () => {
   const tileSize = 30; // Width and height of each tile in pixels
   const gapSize = 2;   // Gap size between tiles in pixels
 
-  const boardWidth = gameState.rows * (tileSize + gapSize);
-  const boardHeight = gameState.columns * (tileSize + gapSize);
+  const boardWidth = rows * (tileSize + gapSize);
+  const boardHeight = columns * (tileSize + gapSize);
 
   board.style.width = `${boardWidth}px`;
   board.style.height = `${boardHeight}px`;
@@ -235,18 +276,19 @@ const updateBoardSize = () => {
 
 const setDifficulty = (mode) => {
   if (mode == "Easy") {
-    gameState.rows = 8;
-    gameState.columns = 8;
-    gameState.minesCount = 10;
+    rows = 8;
+    columns = 8;
+    minesCount = 10;
   } else if (mode == "Normal") {
-    gameState.rows = 16;
-    gameState.columns = 16;
-    gameState.minesCount = 40;
+    rows = 16;
+    columns = 16;
+    minesCount = 40;
   } else if (mode == "Hard") {
-    gameState.rows = 30;
-    gameState.columns = 16;
-    gameState.minesCount = 99;
+    rows = 30;
+    columns = 16;
+    minesCount = 99;
   }
   updateBoardSize();
   startGame();
+  resetTimer();
 }
