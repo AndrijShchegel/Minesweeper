@@ -1,0 +1,7 @@
+Continue working on:
+Experiment about board design
+
+Done:
+On double click tile, reveal other tile if flags around = number on tile
+Disable flag creation after number of flags greater than number of mines
+On first turn dont blow up
