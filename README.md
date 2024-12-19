@@ -17,18 +17,18 @@ Minesweeper - це однокористувацька гра, ціль якої 
 ![3 хвилини гри](images/impossible.png)
 
 ### Вигляд гри після перемоги
-![Перемога](images/win.png)
+![Перемога](images/win_screen.png)
 
 ### Вигляд гри після влучання в міну
-![Поразка](images/lose.png)
+![Поразка](images/lose_screen.png)
 
 ### Різні режими складності
 
 #### Легкий
-![Легка складність](images/lose.png)
+![Легка складність](images/easy.png)
 
 #### Середній
-![Середня складність](images/lose.png)
+![Середня складність](images/normal.png)
 
 #### Складний
-![Важка складність](images/lose.png)
+![Важка складність](images/hard.png)
