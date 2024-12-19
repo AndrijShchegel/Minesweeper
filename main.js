@@ -65,6 +65,7 @@ const rightClick = (event, tile) => {
     flagsLocation = flagsLocation.filter(id => id !== tile.id);
   }
   minesLeft.innerText = minesCount - flagsLocation.length;
+  checkWin();
 };
 
 const setMines = (tileId) => {
@@ -93,6 +94,8 @@ const startGame = () => {
   board.addEventListener("contextmenu", (event) => event.preventDefault());
 
   resetBoard();
+
+  document.getElementById('Win').innerText = '';
   
   minesLeft.innerText = minesCount;
   for (let col = 0; col < columns; col++) {
@@ -167,7 +170,7 @@ const checkFlag = (col, row) => {
 };
 
 const checkWin = () => {
-  if (tilesClicked === rows * columns - minesCount) {
+  if (tilesClicked === rows * columns - minesCount && flagsLocation.length === minesCount) {
     document.getElementById('Win').innerText = 'You are the winner!';
     gameOver = true;
     toggleTimer();
